@@ -1,0 +1,31 @@
+[q]Minimum: 30[\q]
+[q]Core: 30[\q]
+[q]Completion: 30[\q]
+[q]Challenge: 10[\q]
+
+Minimum out of 30: 
+ * [15] Creates the match table for the input pattern.
+ * [15] Performs correct KMP substring search with the pattern and text.
+
+Core out of 30 (up to 70):
+ * [5] Finds the frequency histogram for an input text.
+ * [10] Creates the coding tree for an input text.
+ * [5] Correctly encodes input.
+ * [5] Correctly decodes input.
+ * [5] Answers questions 1 and 2.
+
+Completion out of 30 (up to 90):
+ * [10] Correctly performs Lempel Ziv compression.
+ * [10] Correctly performs Lempel Ziv decompression.
+ * [10] Answers questions 3 and 4.
+
+Challenge out of 10 (up to 100, 5 spare marks):
+ * [10] Implement Boyer-Moore string search OR a more complex coding algorithm,
+        for example:
+         - Adaptive Huffman coding
+         - Arithmetic coding
+ * [5] Find a algorithm for question 5 so that |Z| << 2*(|X| + |Y|).
+
+Final mark calculation:
+
+[q]Minimum: 30[\q] + [q]Core: 30[\q] + [q]Completion: 30[\q] + [q]Challenge: 10[\q]
