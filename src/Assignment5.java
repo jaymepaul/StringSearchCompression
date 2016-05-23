@@ -32,7 +32,7 @@ import javax.swing.border.Border;
 
 /**
  * Handout code for assignment 5.
- * 
+ *
  * @author tony
  */
 public class Assignment5 {
@@ -128,8 +128,10 @@ public class Assignment5 {
 
 				// run the algorithms.
 				LempelZiv lz = new LempelZiv();
+
 				String compressed = lz.compress(text);
 				String decompressed = lz.decompress(compressed);
+
 
 				// write out the encoded text.
 				List<String> lines = Arrays.asList(compressed);
