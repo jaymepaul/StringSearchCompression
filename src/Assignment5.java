@@ -129,8 +129,6 @@ public class Assignment5 {
 				// run the algorithms.
 				LempelZiv lz = new LempelZiv();
 
-				lz.decompress("[0,0,'][0,0,W][0,0,e][0,0,l][1,1,,][0,0, ][0,0,P][0,0,r][0,0,i][0,0,n][0,0,c][10,1,,][8,1,s][0,0,o][3,1,G][7,1,n][5,1,a][6,1,a][5,1,d][4,1,L][0,0,u][19,1,c][10,3,r][17,1, ][18,2,w][4,1,j][14,1,s][0,0,t][5,1,f][14,1,m]");
-
 				String compressed = lz.compress(text);
 				String decompressed = lz.decompress(compressed);
 

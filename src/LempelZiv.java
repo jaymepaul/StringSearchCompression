@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class LempelZiv {
 
-
+	int textLength;
 	/**
 	 * Take uncompressed input as a text string, compress it, and return it as a
 	 * text string.
@@ -18,33 +20,44 @@ public class LempelZiv {
 	public String compress(String input) {
 		// TODO fill this in.
 
+		this.textLength = input.length();
 		StringBuilder sbLZ = new StringBuilder();
 
 		int cursor = 0;
 		int windowSize = 1000;
-
+		
+		outer:
 		while(cursor < input.length()){
 
-			int lookAhead = 0;
+			int lookAhead = 1;
 			int prevMatch = 0;
-
-			//FAILING HERE
-			if(cursor == 3196212)
-				System.out.println();
+			
+			
 
 			while(true){
 
-				String toMatch = input.substring(cursor, (cursor + lookAhead >= input.length())?input.length()-1:cursor+lookAhead);
-				String windowText = input.substring( (cursor < windowSize)?0:cursor-windowSize, (cursor < windowSize)?cursor:cursor - 1);
-
+				String toMatch = input.substring(cursor, (cursor + lookAhead >= input.length())?input.length():cursor+lookAhead);
+//				String windowText = input.substring( (cursor < windowSize)?0:cursor-windowSize, (cursor < windowSize)?cursor:cursor - 1);
+				String windowText = input.substring( (cursor < windowSize)?0:cursor-windowSize, cursor);
+				
 				int match = stringMatch(toMatch, windowText, cursor);
 
 				if( match != -1){
 					prevMatch = match;
+					//System.out.println("cursor: "+ cursor + "	input: "+input.charAt(cursor + lookAhead -1));
 					lookAhead++;
+					
+					if(cursor == input.length()-1){
+						cursor -=1 ;
+						sbLZ.append("["+prevMatch+"|"+ (lookAhead - 1)+"|"+input.charAt(cursor + lookAhead -1)+"]");
+						break outer;
+					}
+					
 				}
 				else{
-					sbLZ.append("["+prevMatch+","+ (lookAhead - 1)+","+input.charAt(cursor + lookAhead -1)+"]");		//[offset, length, nextCharacter] OR [0,0,character]
+		
+					sbLZ.append("["+prevMatch+"|"+ (lookAhead - 1)+"|"+input.charAt(cursor + lookAhead -1)+"]");		//[offset, length, nextCharacter] OR [0,0,character]
+					//System.out.println("cursor: "+ cursor + "	input: "+input.charAt(cursor + lookAhead -1));
 					cursor += lookAhead;
 					break;
 				}
@@ -52,7 +65,7 @@ public class LempelZiv {
 
 		}
 
-		//TOTAL BITS: 3196247 - war and peace
+	
 		return sbLZ.toString();
 	}
 
@@ -66,9 +79,17 @@ public class LempelZiv {
 
 		if(toMatch.equals(""))
 			return 0;
-		else if(windowText.contains(toMatch))
-			return cursor - windowText.lastIndexOf(toMatch);
-
+		else if(windowText.contains(toMatch)){
+//			System.out.println("cursor: "+cursor+"	windowIndex: "+windowText.lastIndexOf(toMatch) + "	toMatch: "+toMatch);
+//		
+			if(cursor > windowText.length()){
+				int diff = cursor - windowText.length();					//Adjust according to text index value not just window index
+				return cursor - (windowText.lastIndexOf(toMatch) + diff);
+			}
+			else
+				return cursor - (windowText.lastIndexOf(toMatch));
+			
+		}
 		return -1;
 	}
 
@@ -85,41 +106,55 @@ public class LempelZiv {
 		int cursor = 0;
 
 		String tupleRegex = "\\[(.*?)\\]";
-		Pattern pattern = Pattern.compile(tupleRegex);
+		Pattern pattern = Pattern.compile(tupleRegex, Pattern.DOTALL);
 		Matcher matcher = pattern.matcher(compressed);
 
 		List<String> textTuples = new ArrayList<String>();
 		while(matcher.find())
-			textTuples.add(matcher.group());
+			textTuples.add(matcher.group());						//Split as Tuple Strings
 
 		List<Tuple> tuples = new ArrayList<Tuple>();
 		for(String tuple : textTuples){
 
-			//REGEX FOR SPLITTING A TUPLE BY COMMA i.e. \\d,\\d,\\w
-			//String s = tuple.split(regex);
-			//tuples.add(new Tuple(Integer.parseInt(s[0]), Integer.parseInt(s[1]), s[2].charAt(0)));
-
+			String sT = tuple.substring(1, tuple.length()-1);
+			String[] sA = sT.split("\\|");							//Split as tokens
+			
+			int offSet = Integer.parseInt(sA[0]);
+			int length = Integer.parseInt(sA[1]);
+			char c = sA[2].charAt(0);
+			
+			tuples.add(new Tuple(offSet, length, c));				//Construct Tuple Objects
+			
 		}
 
-		for(Tuple tuple : tuples){
+		for(int i = 0; i < tuples.size(); i++){
 
-			int offSet = tuple.offSet;
-			int length = tuple.length;
-			char c = tuple.c;
-
+			int offSet = tuples.get(i).offSet;
+			int length = tuples.get(i).length;
+			char c = tuples.get(i).c;
+			
 			if( offSet == 0 && length == 0){					//If [0,0] tuple simply get its character and append to string
 				sbText.append(c);
 				cursor++;
 				continue;
 			}
-
+//
+//			System.out.println("cursor: "+cursor+"	offSet: "+offSet+"	length: "+ length+ "	char: "+c);
+//			
 			char[] patternMatch = new char[length];
-			sbText.getChars( cursor - offSet, (cursor - offSet) + length, patternMatch, 0);
+			sbText.getChars( cursor - offSet, (cursor - offSet) + length, patternMatch, 0);		//Get the characters from offSet to cursor-Off + len
 
-			for(char cN : patternMatch)
+			for(char cN : patternMatch){			//Append character matches
 				sbText.append(cN);
+				cursor++;
+			}
+				
+			if(i == tuples.size()-1)				//Break if at end 
+				break;
+			
+			sbText.append(c);						//Append next char in tuple
+			cursor++;								//Advance cursor		
 
-			cursor += length;
 
 		}
 
