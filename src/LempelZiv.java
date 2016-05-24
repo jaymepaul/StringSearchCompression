@@ -24,38 +24,36 @@ public class LempelZiv {
 		StringBuilder sbLZ = new StringBuilder();
 
 		int cursor = 0;
-		int windowSize = 1000;
-		
+		int windowSize = 3000;
+
 		outer:
 		while(cursor < input.length()){
 
 			int lookAhead = 1;
 			int prevMatch = 0;
-			
-			
 
 			while(true){
 
 				String toMatch = input.substring(cursor, (cursor + lookAhead >= input.length())?input.length():cursor+lookAhead);
 //				String windowText = input.substring( (cursor < windowSize)?0:cursor-windowSize, (cursor < windowSize)?cursor:cursor - 1);
 				String windowText = input.substring( (cursor < windowSize)?0:cursor-windowSize, cursor);
-				
+
 				int match = stringMatch(toMatch, windowText, cursor);
 
 				if( match != -1){
 					prevMatch = match;
 					//System.out.println("cursor: "+ cursor + "	input: "+input.charAt(cursor + lookAhead -1));
 					lookAhead++;
-					
+
 					if(cursor == input.length()-1){
 						cursor -=1 ;
 						sbLZ.append("["+prevMatch+"|"+ (lookAhead - 1)+"|"+input.charAt(cursor + lookAhead -1)+"]");
 						break outer;
 					}
-					
+
 				}
 				else{
-		
+
 					sbLZ.append("["+prevMatch+"|"+ (lookAhead - 1)+"|"+input.charAt(cursor + lookAhead -1)+"]");		//[offset, length, nextCharacter] OR [0,0,character]
 					//System.out.println("cursor: "+ cursor + "	input: "+input.charAt(cursor + lookAhead -1));
 					cursor += lookAhead;
@@ -65,7 +63,7 @@ public class LempelZiv {
 
 		}
 
-	
+
 		return sbLZ.toString();
 	}
 
@@ -81,14 +79,14 @@ public class LempelZiv {
 			return 0;
 		else if(windowText.contains(toMatch)){
 //			System.out.println("cursor: "+cursor+"	windowIndex: "+windowText.lastIndexOf(toMatch) + "	toMatch: "+toMatch);
-//		
+//
 			if(cursor > windowText.length()){
 				int diff = cursor - windowText.length();					//Adjust according to text index value not just window index
 				return cursor - (windowText.lastIndexOf(toMatch) + diff);
 			}
 			else
 				return cursor - (windowText.lastIndexOf(toMatch));
-			
+
 		}
 		return -1;
 	}
@@ -118,13 +116,13 @@ public class LempelZiv {
 
 			String sT = tuple.substring(1, tuple.length()-1);
 			String[] sA = sT.split("\\|");							//Split as tokens
-			
+
 			int offSet = Integer.parseInt(sA[0]);
 			int length = Integer.parseInt(sA[1]);
 			char c = sA[2].charAt(0);
-			
+
 			tuples.add(new Tuple(offSet, length, c));				//Construct Tuple Objects
-			
+
 		}
 
 		for(int i = 0; i < tuples.size(); i++){
@@ -132,7 +130,7 @@ public class LempelZiv {
 			int offSet = tuples.get(i).offSet;
 			int length = tuples.get(i).length;
 			char c = tuples.get(i).c;
-			
+
 			if( offSet == 0 && length == 0){					//If [0,0] tuple simply get its character and append to string
 				sbText.append(c);
 				cursor++;
@@ -140,7 +138,7 @@ public class LempelZiv {
 			}
 //
 //			System.out.println("cursor: "+cursor+"	offSet: "+offSet+"	length: "+ length+ "	char: "+c);
-//			
+//
 			char[] patternMatch = new char[length];
 			sbText.getChars( cursor - offSet, (cursor - offSet) + length, patternMatch, 0);		//Get the characters from offSet to cursor-Off + len
 
@@ -148,12 +146,12 @@ public class LempelZiv {
 				sbText.append(cN);
 				cursor++;
 			}
-				
-			if(i == tuples.size()-1)				//Break if at end 
+
+			if(i == tuples.size()-1)				//Break if at end
 				break;
-			
+
 			sbText.append(c);						//Append next char in tuple
-			cursor++;								//Advance cursor		
+			cursor++;								//Advance cursor
 
 
 		}

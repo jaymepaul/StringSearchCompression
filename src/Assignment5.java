@@ -132,7 +132,6 @@ public class Assignment5 {
 				String compressed = lz.compress(text);
 				String decompressed = lz.decompress(compressed);
 
-
 				// write out the encoded text.
 				List<String> lines = Arrays.asList(compressed);
 				Files.write(compressionOutputFile.toPath(), lines, CHARSET);
