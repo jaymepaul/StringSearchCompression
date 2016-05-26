@@ -91,10 +91,10 @@ output length: 1792281 bytes
 
 Question Two:
 
-war_and_peace.txt:			taisho.txt:				pi.txt	
+war_and_peace.txt:					taisho.txt:							pi.txt	
 input length:  3196247 bytes 		input length:  3649944 bytes		input length:  1010003 bytes 
 output length: 1792281 bytes		output length: 1542656 bytes		output length: 443632 bytes
-Reduction: 56%		         	Reduction: 42%				Reduction: 44%									
+Reduction: 56%		         		Reduction: 42%						Reduction: 44%									
  
 war_and_peace.txt achieves the best encoding as it consists of a high volume of repeated characters that can
 be represented with shorter bit strings. In totality, this allows us to compile a shorter bit string that 

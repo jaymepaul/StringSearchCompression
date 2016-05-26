@@ -52,6 +52,7 @@ public class Assignment5 {
 	// you would include it here and add another case in the onAlgorithmRun
 	// method.
 	private static final String[] ALGORITHMS = { "Huffman coding", "Lempel Ziv" };
+	private static final String[] STRING_SEARCH_ALGOS = { "Knuth-Morris-Pratt", "Boyer-Moore"};
 
 	private JFrame frame;
 	private JFileChooser fileChooser;
@@ -59,6 +60,7 @@ public class Assignment5 {
 	// editor components.
 	private JTextField searchField;
 	private JTextArea textEditor;
+	private JComboBox<String> searchList;
 
 	// compression components and state.
 	private JComboBox<String> list;
@@ -178,6 +180,11 @@ public class Assignment5 {
 				}
 			}
 		});
+		
+		//Drop Down for KMP + Boyer-Moore
+		// a selection box for algorithms.
+		searchList = new JComboBox<>(STRING_SEARCH_ALGOS);
+		searchList.setMaximumSize(searchList.getPreferredSize());
 
 		// next, add in the search box on the top right.
 		searchField = new JTextField(SEARCH_COLS);
@@ -186,11 +193,20 @@ public class Assignment5 {
 			public void actionPerformed(ActionEvent e) {
 				String pattern = searchField.getText();
 				String text = textEditor.getText();
-				int index = new KMP(pattern, text).search(pattern, text);
-
+				
+				String algorithm = (String) searchList.getSelectedItem();
+				
+				int index = -1;
+				if(algorithm.equals("Knuth-Morris-Pratt"))
+					index = new KMP(pattern, text).search(pattern, text);
+				
+				else if(algorithm.equals("Boyer-Moore"))
+					index = new BoyerMoore(pattern, text).search(pattern, text);
+				
 				if (index == -1) {
 					JOptionPane.showMessageDialog(frame, "Pattern not found.");
 				} else {
+					textEditor.setEditable(false);
 					textEditor.requestFocus();
 					textEditor.setSelectionStart(index);
 					textEditor.setSelectionEnd(index + pattern.length());
@@ -212,9 +228,12 @@ public class Assignment5 {
 		// add all the components to the frame.
 		controls.add(load);
 		controls.add(Box.createHorizontalGlue());
+		controls.add(new JLabel("Algorithm "));
+		controls.add(searchList);
 		controls.add(new JLabel("Search"));
 		controls.add(Box.createRigidArea(new Dimension(LAYOUT_GAP, 0)));
 		controls.add(searchField);
+		
 
 		// then, we need to make the editor area itself.
 		textEditor = new JTextArea(EDITOR_ROWS, EDITOR_COLS);
